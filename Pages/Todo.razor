@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace MyToDoBlazorApp.Pages
+@using Microsoft.EntityFrameworkCore
+@using BlazorApp.Models
+
+@page "/todo"
+@inject AppDbContext DbContext
+
+<h3>Todo List</h3>
+<ul>
+    @foreach (var item in TodoItems)
+    {
+        <li>@item.Title - @(item.IsCompleted ? "Completed" : "Pending")</li>
+    }
+</ul>
+
+@code {
+    private List<TodoItem> TodoItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TodoItems = await DbContext.TodoItems.ToListAsync();
+    }
+}
