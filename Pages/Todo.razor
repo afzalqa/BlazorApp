@@ -7,32 +7,63 @@
 @inject HttpClient Http
 
 <h3>Todo List</h3>
-<ul>
-    @foreach (var todo in TodoItems)
-    {
-        <li>
-            @todo.Title - @(todo.IsCompleted ? "Completed" : "Pending")
-            <button @onclick="() => Edit(todo)">Edit</button>
-            <button @onclick="() => Delete(todo.Id)">Delete</button>
-        </li>
-    }
-</ul>
+<div class="card">
+    <div class="card-header">
+        <h4>Tasks</h4>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            @foreach (var todo in TodoItems)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>@todo.Title - @(todo.IsCompleted ? "Completed" : "Pending")</span>
+                    <div>
+                        <button class="btn btn-sm btn-primary me-2" @onclick="() => Edit(todo)">Edit</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(todo.Id)">Delete</button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
 
-<h4>Add New Todo</h4>
-<EditForm Model="newTodo" OnValidSubmit="AddTodo">
-    <InputText @bind-Value="newTodo.Title" placeholder="Title" />
-    <InputCheckbox @bind-Value="newTodo.IsCompleted" /> Completed
-    <button type="submit">Add</button>
-</EditForm>
+<div class="card mt-4">
+    <div class="card-header">
+        <h4>Add New Todo</h4>
+    </div>
+    <div class="card-body">
+        <EditForm Model="newTodo" OnValidSubmit="AddTodo">
+            <div class="mb-3">
+                <InputText class="form-control" @bind-Value="newTodo.Title" placeholder="Title" />
+            </div>
+            <div class="form-check mb-3">
+                <InputCheckbox class="form-check-input" @bind-Value="newTodo.IsCompleted" />
+                <label class="form-check-label">Completed</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Add</button>
+        </EditForm>
+    </div>
+</div>
 
 @if (selectedTodo != null)
 {
-    <h4>Edit Todo</h4>
-    <EditForm Model="selectedTodo" OnValidSubmit="SaveEdit">
-        <InputText @bind-Value="selectedTodo.Title" />
-        <InputCheckbox @bind-Value="selectedTodo.IsCompleted" /> Completed
-        <button type="submit">Save</button>
-    </EditForm>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4>Edit Todo</h4>
+        </div>
+        <div class="card-body">
+            <EditForm Model="selectedTodo" OnValidSubmit="SaveEdit">
+                <div class="mb-3">
+                    <InputText class="form-control" @bind-Value="selectedTodo.Title" />
+                </div>
+                <div class="form-check mb-3">
+                    <InputCheckbox class="form-check-input" @bind-Value="selectedTodo.IsCompleted" />
+                    <label class="form-check-label">Completed</label>
+                </div>
+                <button class="btn btn-success" type="submit">Save</button>
+            </EditForm>
+        </div>
+    </div>
 }
 
 @code {
