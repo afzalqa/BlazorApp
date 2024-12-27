@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7208/api/") });
+
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();

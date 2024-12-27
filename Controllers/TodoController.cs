@@ -37,7 +37,7 @@ namespace BlazorApp.Controllers
             {
                 return BadRequest(new { code = 2, message = "Todo item not found." }); 
             }
-
+            
             existingTodo.Title = todoItem.Title;
             existingTodo.IsCompleted = todoItem.IsCompleted;
 

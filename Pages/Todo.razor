@@ -3,22 +3,73 @@
 @using Microsoft.EntityFrameworkCore
 @using BlazorApp.Models
 
-@page "/todo"
-@inject AppDbContext DbContext
+@page "/todo-list"
+@inject HttpClient Http
 
 <h3>Todo List</h3>
 <ul>
-    @foreach (var item in TodoItems)
+    @foreach (var todo in TodoItems)
     {
-        <li>@item.Title - @(item.IsCompleted ? "Completed" : "Pending")</li>
+        <li>
+            @todo.Title - @(todo.IsCompleted ? "Completed" : "Pending")
+            <button @onclick="() => Edit(todo)">Edit</button>
+            <button @onclick="() => Delete(todo.Id)">Delete</button>
+        </li>
     }
 </ul>
 
+<h4>Add New Todo</h4>
+<EditForm Model="newTodo" OnValidSubmit="AddTodo">
+    <InputText @bind-Value="newTodo.Title" placeholder="Title" />
+    <InputCheckbox @bind-Value="newTodo.IsCompleted" /> Completed
+    <button type="submit">Add</button>
+</EditForm>
+
+@if (selectedTodo != null)
+{
+    <h4>Edit Todo</h4>
+    <EditForm Model="selectedTodo" OnValidSubmit="SaveEdit">
+        <InputText @bind-Value="selectedTodo.Title" />
+        <InputCheckbox @bind-Value="selectedTodo.IsCompleted" /> Completed
+        <button type="submit">Save</button>
+    </EditForm>
+}
+
 @code {
-    private List<TodoItem> TodoItems;
+    private List<TodoItem> TodoItems = new();
+    private TodoItem newTodo = new();
+    private TodoItem? selectedTodo;
 
     protected override async Task OnInitializedAsync()
     {
-        TodoItems = await DbContext.TodoItems.ToListAsync();
+        TodoItems = await Http.GetFromJsonAsync<List<TodoItem>>("https://localhost:7208/api/Todo");
+    }
+
+    private async Task AddTodo()
+    {
+        await Http.PostAsJsonAsync("https://localhost:7208/api/Todo", newTodo);
+        newTodo = new TodoItem();
+        TodoItems = await Http.GetFromJsonAsync<List<TodoItem>>("https://localhost:7208/api/Todo");
+    }
+
+    private void Edit(TodoItem todo)
+    {
+        selectedTodo = todo;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (selectedTodo != null)
+        {
+            await Http.PutAsJsonAsync($"https://localhost:7208/api/Todo/{selectedTodo.Id}", selectedTodo);
+            selectedTodo = null;
+            TodoItems = await Http.GetFromJsonAsync<List<TodoItem>>("https://localhost:7208/api/Todo");
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        await Http.DeleteAsync($"https://localhost:7208/api/Todo/{id}");
+        TodoItems = await Http.GetFromJsonAsync<List<TodoItem>>("https://localhost:7208/api/Todo");
     }
 }
